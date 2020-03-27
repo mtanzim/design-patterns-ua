@@ -11,7 +11,9 @@ public class Playlist implements IComponent {
 
     // Your code goes here!
     public void play() {
-        // play
+        for (IComponent song : playlist) {
+            song.play();
+        }
     }
 
     public void setPlaybackSpeed(float speed) {

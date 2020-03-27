@@ -10,7 +10,7 @@ public class Song implements IComponent {
 
     // Your code goes here!
     public void play() {
-        // play
+        // play using this.speed
     }
 
     public void setPlaybackSpeed(float speed) {
