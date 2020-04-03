@@ -49,7 +49,7 @@ public class EditContactActivity extends AppCompatActivity {
             return;
         }
 
-        if (!email_str.contains("@")){
+        if (!email_str.contains("@")) {
             email.setError("Must be an email address!");
             return;
         }
@@ -66,9 +66,12 @@ public class EditContactActivity extends AppCompatActivity {
 
         Contact updated_contact = new Contact(username_str, email_str, id);
 
-        contact_list.deleteContact(contact);
-        contact_list.addContact(updated_contact);
-        contact_list.saveContacts(context);
+        EditContactCommand edit_contact_cmd = new EditContactCommand(contact_list, updated_contact, contact, context);
+        edit_contact_cmd.execute();
+        boolean success = edit_contact_cmd.isExecuted();
+        if (!success) {
+            return;
+        }
 
         // End EditContactActivity
         finish();
@@ -78,6 +81,13 @@ public class EditContactActivity extends AppCompatActivity {
 
         contact_list.deleteContact(contact);
         contact_list.saveContacts(context);
+
+        DeleteContactCommand del_contact_cmd = new DeleteContactCommand(contact_list, contact, context);
+        del_contact_cmd.execute();
+        boolean success = del_contact_cmd.isExecuted();
+        if (!success) {
+            return;
+        }
 
         // End EditContactActivity
         finish();
