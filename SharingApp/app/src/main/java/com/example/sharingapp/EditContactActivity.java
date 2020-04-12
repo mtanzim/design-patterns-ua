@@ -22,6 +22,10 @@ public class EditContactActivity extends AppCompatActivity {
     private EditText username;
     private Context context;
 
+    private String email_str;
+    private String username_str;
+    private String id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,35 +38,47 @@ public class EditContactActivity extends AppCompatActivity {
         int pos = intent.getIntExtra("position", 0);
 
         contact = contactListController.getContact(pos);
+        contactController = new ContactController(contact);
 
         username = (EditText) findViewById(R.id.username);
         email = (EditText) findViewById(R.id.email);
+
+        email_str = email.getText().toString();
+        username_str = username.getText().toString();
+        id = contact.getId(); // Reuse the contact id
 
         username.setText(contact.getUsername());
         email.setText(contact.getEmail());
     }
 
-    public void saveContact(View view) {
+    private boolean validateInput() {
 
-        String email_str = email.getText().toString();
 
         if (email_str.equals("")) {
             email.setError("Empty field!");
-            return;
+            return false;
         }
 
         if (!email_str.contains("@")) {
             email.setError("Must be an email address!");
-            return;
+            return false;
         }
 
-        String username_str = username.getText().toString();
-        String id = contact.getId(); // Reuse the contact id
 
         // Check that username is unique AND username is changed (Note: if username was not changed
         // then this should be fine, because it was already unique.)
         if (!contactListController.isUsernameAvailable(username_str) && !(contactController.getUsername().equals(username_str))) {
             username.setError("Username already taken!");
+            return false;
+        }
+        return true;
+
+
+    }
+
+    public void saveContact(View view) {
+
+        if (!validateInput()) {
             return;
         }
 

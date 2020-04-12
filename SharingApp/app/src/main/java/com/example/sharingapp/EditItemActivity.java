@@ -44,13 +44,21 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
     private EditText width;
     private EditText height;
     private Spinner borrower_spinner;
-    private TextView  borrower_tv;
+    private TextView borrower_tv;
     private Switch status;
     private EditText invisible;
+
+    private String title_str;
+    private String maker_str;
+    private String description_str;
+    private String length_str;
+    private String width_str;
+    private String height_str;
 
     private ArrayAdapter<String> adapter;
     private boolean on_create_update = false;
     private int pos;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +76,13 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
         photo = (ImageView) findViewById(R.id.image_view);
         status = (Switch) findViewById(R.id.available_switch);
         invisible = (EditText) findViewById(R.id.invisible);
+
+        title_str = title.getText().toString();
+        maker_str = maker.getText().toString();
+        description_str = description.getText().toString();
+        length_str = length.getText().toString();
+        width_str = width.getText().toString();
+        height_str = height.getText().toString();
 
         invisible.setVisibility(View.GONE);
 
@@ -100,8 +115,8 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
     }
 
     @Override
-    protected void onActivityResult(int request_code, int result_code, Intent intent){
-        if (request_code == REQUEST_CODE && result_code == RESULT_OK){
+    protected void onActivityResult(int request_code, int result_code, Intent intent) {
+        if (request_code == REQUEST_CODE && result_code == RESULT_OK) {
             Bundle extras = intent.getExtras();
             image = (Bitmap) extras.get("data");
             photo.setImageBitmap(image);
@@ -123,14 +138,41 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
         startActivity(intent);
     }
 
-    public void saveItem(View view) {
+    private boolean validateInput() {
+        if (title_str.equals("")) {
+            title.setError("Empty field!");
+            return false;
+        }
 
-        String title_str = title.getText().toString();
-        String maker_str = maker.getText().toString();
-        String description_str = description.getText().toString();
-        String length_str = length.getText().toString();
-        String width_str = width.getText().toString();
-        String height_str = height.getText().toString();
+        if (maker_str.equals("")) {
+            maker.setError("Empty field!");
+            return false;
+        }
+
+        if (description_str.equals("")) {
+            description.setError("Empty field!");
+            return false;
+        }
+
+        if (length_str.equals("")) {
+            length.setError("Empty field!");
+            return false;
+        }
+
+        if (width_str.equals("")) {
+            width.setError("Empty field!");
+            return false;
+        }
+
+        if (height_str.equals("")) {
+            height.setError("Empty field!");
+            return false;
+        }
+        return true;
+
+    }
+
+    public void saveItem(View view) {
 
         Contact contact = null;
         if (!status.isChecked()) {
@@ -138,36 +180,9 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
             contact = contact_list_controller.getContactByUsername(borrower_str);
         }
 
-        if (title_str.equals("")) {
-            title.setError("Empty field!");
+        if (!validateInput()) {
             return;
         }
-
-        if (maker_str.equals("")) {
-            maker.setError("Empty field!");
-            return;
-        }
-
-        if (description_str.equals("")) {
-            description.setError("Empty field!");
-            return;
-        }
-
-        if (length_str.equals("")) {
-            length.setError("Empty field!");
-            return;
-        }
-
-        if (width_str.equals("")) {
-            width.setError("Empty field!");
-            return;
-        }
-
-        if (height_str.equals("")) {
-            height.setError("Empty field!");
-            return;
-        }
-
         String id = item_controller.getId(); // Reuse the item id
         Item updated_item = new Item(title_str, maker_str, description_str, image, id);
         ItemController updated_item_controller = new ItemController(updated_item);
@@ -196,7 +211,7 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
      * Checked == "Available"
      * Unchecked == "Borrowed"
      */
-    public void toggleSwitch(View view){
+    public void toggleSwitch(View view) {
         if (status.isChecked()) {
             // Means was previously borrowed, switch was toggled to available
             borrower_spinner.setVisibility(View.GONE);
@@ -206,7 +221,7 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
 
         } else {
             // Means not borrowed
-            if (contact_list.getSize()==0){
+            if (contact_list.getSize() == 0) {
                 // No contacts, need to add contacts to be able to add a borrower
                 invisible.setEnabled(false);
                 invisible.setVisibility(View.VISIBLE);
@@ -226,7 +241,7 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
      * Only need to update the view from the onCreate method
      */
     public void update() {
-        if (on_create_update){
+        if (on_create_update) {
             adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
                     contact_list_controller.getAllUsernames());
             borrower_spinner.setAdapter(adapter);
@@ -235,7 +250,7 @@ public class EditItemActivity extends AppCompatActivity implements Observer {
             item_controller = new ItemController(item);
 
             Contact contact = item_controller.getBorrower();
-            if (contact != null){
+            if (contact != null) {
                 int contact_pos = contact_list_controller.getIndex(contact);
                 borrower_spinner.setSelection(contact_pos);
             }
