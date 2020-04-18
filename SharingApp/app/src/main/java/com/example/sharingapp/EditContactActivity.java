@@ -8,9 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 
 /**
- * Editing a pre-existing contact consists of deleting the old contact and adding a new contact with the old
- * contact's id.
- * Note: You will not be able contacts which are "active" borrowers
+ * Editing a pre-existing contact consists of deleting the old contact and
+ * adding a new contact with the old contact's id. Note: You will not be able
+ * contacts which are "active" borrowers
  */
 public class EditContactActivity extends AppCompatActivity {
 
@@ -34,6 +34,7 @@ public class EditContactActivity extends AppCompatActivity {
         int pos = intent.getIntExtra("position", 0);
 
         contact = contactListController.getContact(pos);
+        contactController = new ContactController(contact);
 
         username = (EditText) findViewById(R.id.username);
         email = (EditText) findViewById(R.id.email);
@@ -59,9 +60,11 @@ public class EditContactActivity extends AppCompatActivity {
         String username_str = username.getText().toString();
         String id = contact.getId(); // Reuse the contact id
 
-        // Check that username is unique AND username is changed (Note: if username was not changed
+        // Check that username is unique AND username is changed (Note: if username was
+        // not changed
         // then this should be fine, because it was already unique.)
-        if (!contactListController.isUsernameAvailable(username_str) && !(contactController.getUsername().equals(username_str))) {
+        if (!contactListController.isUsernameAvailable(username_str)
+                && !(contactController.getUsername().equals(username_str))) {
             username.setError("Username already taken!");
             return;
         }
