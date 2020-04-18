@@ -12,7 +12,7 @@ import android.widget.EditText;
  * adding a new contact with the old contact's id. Note: You will not be able
  * contacts which are "active" borrowers
  */
-public class EditContactActivity extends AppCompatActivity {
+public class EditContactActivity extends AppCompatActivity implements Observer {
 
     private ContactList contact_list = new ContactList();
     private ContactListController contactListController = new ContactListController(contact_list);
@@ -28,6 +28,7 @@ public class EditContactActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_contact);
 
         context = getApplicationContext();
+        contact_list_controller.addObserver(this);
         contactListController.loadContacts(context);
 
         Intent intent = getIntent();
@@ -58,7 +59,7 @@ public class EditContactActivity extends AppCompatActivity {
         }
 
         String username_str = username.getText().toString();
-        String id = contact.getId(); // Reuse the contact id
+        String id = contact_controller.getId(); // Reuse the contact id
 
         // Check that username is unique AND username is changed (Note: if username was
         // not changed
@@ -88,4 +89,34 @@ public class EditContactActivity extends AppCompatActivity {
         // End EditContactActivity
         finish();
     }
+
+    /**
+     * Called when the activity is destroyed, thus we remove this activity as a
+     * listener
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        contact_list_controller.removeObserver(this);
+    }
+
+    /**
+     * Only need to update the view from the onCreate method
+     */
+    public void update() {
+
+        if (on_create_update) {
+
+            contact = contact_list_controller.getContact(pos);
+            contact_controller = new ContactController(contact);
+
+            username = (EditText) findViewById(R.id.username);
+            email = (EditText) findViewById(R.id.email);
+
+            // Update the view
+            username.setText(contact_controller.getUsername());
+            email.setText(contact_controller.getEmail());
+        }
+    }
+
 }
